@@ -56,7 +56,7 @@ function config($key, $default = null)
 }
 
 $dsn = "mysql:host=" . config("db_host") . ";dbname=" . config("db_name") . ";charset=utf8";
-$opt = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_EMULATE_PREPARES => false];
+$opt = [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_EMULATE_PREPARES => false];
 $pdo = new PDO($dsn, config("db_user") , config("db_pass") , $opt);
 $readpdo = new PDO($dsn, config("db_user") , config("db_pass") , $opt);
 $prepareds['select_flight'] = "SELECT * FROM `flights` WHERE `callsign`=:callsign AND `vatsim_id`=:vatsim_id AND `created_at` >= DATE_SUB(NOW(), INTERVAL 24 HOUR) ORDER BY created_at DESC LIMIT 1";
