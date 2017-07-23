@@ -109,7 +109,7 @@ function process_line($line) {
       'status' => 'Departing Soon',
       'departed_at' => '',
       'arrived_at' => '',
-      'arrival_est' => '',
+      'arrival_est' => null,
       'lat' => 0,
       'lon' => 0,
       'hdg' => 0,
