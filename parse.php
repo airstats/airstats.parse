@@ -77,11 +77,11 @@ function process_line($line) {
     ':callsign' => $data[callsign],
     ':vatsim_id' => $data[cid]
   ]);
-  if (!$stmt)
+  if ($stmt->rowCount() != 1)
     $flight = false;
   else
     $flight = $stmt->fetch();
-    
+
   if ($flight && $flight['status'] == "Incomplete" && $flight['departure'] == substr($data[planned_depairport], 0, 4)
     && $flight['arrival'] == substr($data[planned_destairport], 0, 4) && !check_departure($data[latitude], $data[longitude], $data[groundspeed], $data[planned_destairport])) {
       // Resuming flight
@@ -90,7 +90,23 @@ function process_line($line) {
     $new = 1;
     $flight = [
       'callsign' => $data[callsign],
-      'vatsim_id' => $data[cid]
+      'vatsim_id' => $data[cid],
+      'aircraft_type' => '',
+      'departure' => '',
+      'arrival' => '',
+      'route' => '',
+      'remarks' => '',
+      'planned_alt' => '',
+      'status' => '',
+      'departed_at' => '',
+      'arrived_at' => '',
+      'arrival_est' => '',
+      'lat' => 0,
+      'lon' => 0,
+      'hdg' => 0,
+      'spd' => 0,
+      'last_update' => '',
+      'missing_count' => 0
     ];
   }
 
