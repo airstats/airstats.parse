@@ -81,7 +81,8 @@ function checkArrival($lat, $lon, $spd, $arrival)
     return false;
   }
   if (!isset($airport[$arrival])) {
-    $stmt = $readpdo->prepare($prepareds['select_airport'])->execute([":id" => $arrival]);
+    $stmt = $readpdo->prepare($prepareds['select_airport']);
+    $stmt->execute([":id" => $arrival]);
     $row = $stmt->fetch();
     if ($row) {
       $airport[$arrival]['lat'] = $row['lat'];
@@ -107,7 +108,8 @@ function checkDeparture($lat, $lon, $spd, $departure)
     return false;
   }
   if (!isset($airport[$departure])) {
-    $stmt = $readpdo->prepare($prepareds['select_airport'])->execute([":id" => $departure]);
+    $stmt = $readpdo->prepare($prepareds['select_airport']);
+    $stmt->execute([":id" => $departure]);
     $row = $stmt->fetch();
     if ($row) {
       $airport[$departure]['lat'] = $row['lat'];
@@ -138,7 +140,8 @@ function arrivalEst($lat, $lon, $spd, $arrival, $status)
   }
 
   if (!isset($airport[$arrival])) {
-    $stmt = $readpdo->prepare($prepareds['select_airport'])->execute([":id" => $arrival]);
+    $stmt = $readpdo->prepare($prepareds['select_airport']);
+    $stmt->execute([":id" => $arrival]);
     $row = $stmt->fetch();
     if ($row) {
       $airport[$arrival]['lat'] = $row['lat'];

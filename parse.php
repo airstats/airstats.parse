@@ -164,7 +164,11 @@ function process_line($line) {
       array_filter($flight, function($key) use ($allowed) { return in_array($key, $allowed);}, ARRAY_FILTER_USE_KEY)
     );
   } else {
+    var_dump($flight);
     $allowed = ['callsign','vatsim_id','aircraft_type','departure','arrival','planned_alt','route','remarks','status','lat','lon','alt','hdg','spd','last_update'];
+
+    var_dump(array_filter($flight, function($key) use ($allowed) { return in_array($key, $allowed); }, ARRAY_FILTER_USE_KEY));
+
     $pdo->prepare($prepareds['insert_flight'])->execute(
       array_filter($flight, function($key) use ($allowed) { return in_array($key, $allowed);}, ARRAY_FILTER_USE_KEY)
     );
