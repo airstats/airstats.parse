@@ -84,7 +84,7 @@ function process_line($line) {
     $flight = $stmt->fetch();
 
   if ($flight && $flight['status'] == "Incomplete" && $flight['departure'] == substr($data[planned_depairport], 0, 4)
-    && $flight['arrival'] == substr($data[planned_destairport], 0, 4) && !check_departure($data[latitude], $data[longitude], $data[groundspeed], $data[planned_destairport])) {
+    && $flight['arrival'] == substr($data[planned_destairport], 0, 4) && !checkDeparture($data[latitude], $data[longitude], $data[groundspeed], $data[planned_destairport])) {
       // Resuming flight
       $flight['status'] = "En-Route";
   } elseif (!$flight || ($flight['status'] == "Arrived" && !checkArrival($data[latitude], $data[longitude], $data[groundspeed], $data[planned_destairport]))) {
