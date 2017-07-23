@@ -152,9 +152,7 @@ function arrivalEst($lat, $lon, $spd, $arrival, $status)
       return false;
     }
   }
-  echo "$lat, $lon --> " . $airport[$arrival]['lat'] . ", " . $airport[$arrival]['lon'] . " ($arrival)\n";
   $dist = calc_distance($lat, $lon, $airport[$arrival]['lat'], $airport[$arrival]['lon']);
-  echo " --- Distance $dist nm\n";
   $time = $dist / $spd; // Ground speed estimate
   $hr = floor($time);
   $min = intval((($hr - $time) + .25) * 60);
