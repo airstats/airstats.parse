@@ -164,9 +164,9 @@ function process_line($line) {
 
   $flight['last_update'] = $current_update;
   $flight['missing_count'] = 0;
-  if ($flight['status'] == "En-Route") {
+  /*if ($flight['status'] == "En-Route") {
     $flight['arrival_est'] = arrivalEst($flight['lat'],$flight['lon'],$flight['spd'],$flight['arrival'],$flight['status']);
-  }
+  }*/
 
   if (!$new) {
     if (empty($flight['arrival_est'])) { $flight['arrival_est'] = null; }
