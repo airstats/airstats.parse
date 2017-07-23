@@ -26,7 +26,7 @@ if (isset($output[0]) && $output[0] == ";  END") {
 unset($output);
 // Get update timestamp, don't duplicate updates.
 exec("sed -n -r \"s/UPDATE = ([0-9]+)/\\1/p\" " . config('DATAFILE'), $output);
-if ($output[0] == $lastts) {
+if ($lastts && $output[0] == $lastts) {
   exit;                         // We got this TS already
 }
 
@@ -61,6 +61,8 @@ function process_line($line) {
   if ($data[clienttype] == "ATC") return;
   if (!$data[planned_depairport] || !$data[planned_destairport]) return;
   if (!$data[latitude] || !$data[longitude]) return;
+
+  echo $data[callsign] . " processing...\n";
 
   // Little reformatting
   $data[callsign] = str_replace("-", "", $data[callsign]);
@@ -179,18 +181,20 @@ function process_missing() {
   global $readpdo, $pdo, $prepareds, $current_update;
 
   $stmt = $readpdo->prepare($prepareds['select_missing'])->execute(['current_update' => $current_update]);
-  while ($row = $stmt->fetch()) {
-    $pdo->prepare($prepareds['update_missing_count'])->execute(['id' => $row['id'], 'missing_count' => $row['missing_count'] + 1]);
+  if ($stmt) {
+    while ($row = $stmt->fetch()) {
+      $pdo->prepare($prepareds['update_missing_count'])->execute(['id' => $row['id'], 'missing_count' => $row['missing_count'] + 1]);
 
-    $row['missing_count'] += 1; // For processing's sake
+      $row['missing_count'] += 1; // For processing's sake
 
-    if ($row['missing_count'] >= 5) {
-      if ($row['status'] == "Departing Soon") {
-        $pdo->prepare($prepareds['delete_flight'])->execute(['id' => $flight['id']]);
-        $pdo->prepare($prepareds['delete_positions'])->execute(['flight_id' => $flight['id']]);
-      } else {
-        $pdo->prepare($prepareds['update_missing_count'])->execute(['id' => $flight['id'], 'missing_count' => 0]);
-        $pdo->prepare($prepareds['update_status'])->execute(['id' => $flight['id'], 'status' => 'Incomplete']);
+      if ($row['missing_count'] >= 5) {
+        if ($row['status'] == "Departing Soon") {
+          $pdo->prepare($prepareds['delete_flight'])->execute(['id' => $flight['id']]);
+          $pdo->prepare($prepareds['delete_positions'])->execute(['flight_id' => $flight['id']]);
+        } else {
+          $pdo->prepare($prepareds['update_missing_count'])->execute(['id' => $flight['id'], 'missing_count' => 0]);
+          $pdo->prepare($prepareds['update_status'])->execute(['id' => $flight['id'], 'status' => 'Incomplete']);
+        }
       }
     }
   }
