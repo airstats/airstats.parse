@@ -156,7 +156,9 @@ function arrivalEst($lat, $lon, $spd, $arrival, $status)
   $hr = floor($time);
   $min = intval((($hr - $time) + .25) * 60);
   $est = new DateTime();
-  $est->add(new DateInterval("P" . $hr . "H" . $min . "M"));
+  if ($hr > 0) { $hr = $hr . "H"; } else { $hr = ""; }
+  if ($min > 0) { $min = $min . "M"; } else { $min = ""; }
+  $est->add(new DateInterval("P" . $hr . $min));
   return $est->format("Y-m-d H:i:s");
 }
 
