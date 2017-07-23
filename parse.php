@@ -213,11 +213,11 @@ function process_missing() {
 
       if ($row['missing_count'] >= 5) {
         if ($row['status'] == "Departing Soon") {
-          $pdo->prepare($prepareds['delete_flight'])->execute(['id' => $flight['id']]);
-          $pdo->prepare($prepareds['delete_positions'])->execute(['flight_id' => $flight['id']]);
+          $pdo->prepare($prepareds['delete_flight'])->execute(['id' => $row['id']]);
+          $pdo->prepare($prepareds['delete_positions'])->execute(['flight_id' => $row['id']]);
         } else {
-          $pdo->prepare($prepareds['update_missing_count'])->execute(['id' => $flight['id'], 'missing_count' => 0]);
-          $pdo->prepare($prepareds['update_status'])->execute(['id' => $flight['id'], 'status' => 'Incomplete']);
+          $pdo->prepare($prepareds['update_missing_count'])->execute(['id' => $row['id'], 'missing_count' => 0]);
+          $pdo->prepare($prepareds['update_status'])->execute(['id' => $row['id'], 'status' => 'Incomplete']);
         }
       }
     }
