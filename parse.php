@@ -62,8 +62,6 @@ function process_line($line) {
   if (!$data[planned_depairport] || !$data[planned_destairport]) return;
   if (!$data[latitude] || !$data[longitude]) return;
 
-  echo $data[callsign] . " processing...\n";
-
   // Little reformatting
   $data[callsign] = str_replace("-", "", $data[callsign]);
   $data[planned_altitude] = preg_replace("/[FAL]+/", "", $data[planned_altitude]); // Change ICAO and FL350 altitude entries into VATSIM-standard
@@ -164,11 +162,7 @@ function process_line($line) {
       array_filter($flight, function($key) use ($allowed) { return in_array($key, $allowed);}, ARRAY_FILTER_USE_KEY)
     );
   } else {
-    var_dump($flight);
     $allowed = ['callsign','vatsim_id','aircraft_type','departure','arrival','planned_alt','route','remarks','status','lat','lon','alt','hdg','spd','last_update'];
-
-    var_dump(array_filter($flight, function($key) use ($allowed) { return in_array($key, $allowed); }, ARRAY_FILTER_USE_KEY));
-
     $pdo->prepare($prepareds['insert_flight'])->execute(
       array_filter($flight, function($key) use ($allowed) { return in_array($key, $allowed);}, ARRAY_FILTER_USE_KEY)
     );
@@ -183,13 +177,15 @@ function process_line($line) {
   }
 
   $interval = 0;
-  $row = $pdo->prepare($prepareds['select_position'])->execute(['flight_id' => $flight['id']]);
-  if ($row) {
+  $stmt = $pdo->prepare($prepareds['select_position']);
+  $stmt->execute(['flight_id' => $flight['id']]);
+  if ($stmt) {
+    $row = $stmt->fetch();
     $lastposition = new DateTime($row['created_at']);
     $posinterval = $lastpos->diff(new DateTime("now"), true);
     $posinterval = $lastpos->format("%i");
   }
-  if (!$row || ($row && $posinterval >= $interval) || $changedstatus || $new) {
+  if (!$stmt || ($stmt && $posinterval >= $interval) || $changedstatus || $new) {
     $pdo->prepare($prepareds['insert_position'])->execute([
       'id'        => $flight['id'] . '-' . $current_update,
       'flight_id' => $flight['id'],
@@ -205,7 +201,8 @@ function process_line($line) {
 function process_missing() {
   global $readpdo, $pdo, $prepareds, $current_update;
 
-  $stmt = $readpdo->prepare($prepareds['select_missing'])->execute(['current_update' => $current_update]);
+  $stmt = $readpdo->prepare($prepareds['select_missing']);
+  $stmt->execute(['current_update' => $current_update]);
   if ($stmt) {
     while ($row = $stmt->fetch()) {
       $pdo->prepare($prepareds['update_missing_count'])->execute(['id' => $row['id'], 'missing_count' => $row['missing_count'] + 1]);
