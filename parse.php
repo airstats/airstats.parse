@@ -143,7 +143,7 @@ function process_line($line) {
     } elseif (airborne($flight['spd'])) {
       $flight['status'] = "En-Route"; $changedstatus = 1;
     } else {
-      $flight->status = "Unknown"; $changedstatus = 1;    // Should never get here unless the plane diverted elsewhere without a FP change
+      $flight['status'] = "Unknown"; $changedstatus = 1;    // Should never get here unless the plane diverted elsewhere without a FP change
     }
   } elseif (($flight['status'] == "Departing Soon" || $flight['status'] == "Incomplete") && airborne($flight['spd'])) {
     $flight['departed_at'] = ($flight['departed_at']) ? $flight['departed_at'] : date("Y-m-d H:i:s");
