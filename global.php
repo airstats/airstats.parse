@@ -59,6 +59,7 @@ $dsn = "mysql:host=" . config("db_host") . ";dbname=" . config("db_name") . ";ch
 $opt = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_EMULATE_PREPARES => false];
 $pdo = new PDO($dsn, config("db_user") , config("db_pass") , $opt);
 $readpdo = new PDO($dsn, config("db_user") , config("db_pass") , $opt);
+$flightpdo = new PDO($dsn, config("db_user") , config("db_pass") , $opt);
 $prepareds['select_flight'] = "SELECT * FROM `flights` WHERE `callsign`=:callsign AND `vatsim_id`=:vatsim_id AND `created_at` >= DATE_SUB(NOW(), INTERVAL 24 HOUR) ORDER BY created_at DESC LIMIT 1";
 $prepareds['update_flight'] = "UPDATE `flights` SET `aircraft_type`=:aircraft_type, `departure`=:departure, `arrival`=:arrival, `planned_alt`=:planned_alt, `route`=:route, `remarks`=:remarks, `status`=:status, `departed_at`=:departed_at, `arrived_at`=:arrived_at, `arrival_est`=:arrival_est, `lat`=:lat, `lon`=:lon, `alt`=:alt, `hdg`=:hdg, `spd`=:spd, `missing_count`=:missing_count, `last_update`=:last_update, updated_at=NOW() WHERE `id`=:id";
 $prepareds['insert_flight'] = "INSERT INTO `flights`(`callsign`,`vatsim_id`,`aircraft_type`,`departure`,`arrival`,`planned_alt`,`route`,`remarks`,`status`,`lat`,`lon`,`alt`,`hdg`,`spd`,`last_update`,`created_at`,`updated_at`) VALUES(:callsign, :vatsim_id, :aircraft_type, :departure, :arrival, :planned_alt, :route, :remarks, :status, :lat, :lon, :alt, :hdg, :spd, :last_update, NOW(), NOW())";
@@ -153,13 +154,11 @@ function arrivalEst($lat, $lon, $spd, $arrival, $status)
   }
   $dist = calc_distance($lat, $lon, $airport[$arrival]['lat'], $airport[$arrival]['lon']);
   $time = $dist / $spd; // Ground speed estimate
-  echo "Estimating $dist at $spd in $time\n";
   $hr = floor($time);
   $min = intval((($hr - $time) + .25) * 60);
   $est = new DateTime();
   if ($hr > 0) { $hr = $hr . "H"; } else { $hr = ""; }
   if ($min > 0) { $min = $min . "M"; } else { $min = "15M"; }
-  echo "Adding P$hr$min\n";
   $est->add(new DateInterval("P" . $hr . $min));
   return $est->format("Y-m-d H:i:s");
 }

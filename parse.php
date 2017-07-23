@@ -40,6 +40,7 @@ fclose($fp);
 
 $stream = file(config("DATAFILE"), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 $in_clients = false;
+$x = 0;
 foreach ($stream as $line) {
   if (preg_match("/^!CLIENTS:/", $line)) {
     $in_clients = true;
@@ -49,13 +50,20 @@ foreach ($stream as $line) {
 
   if (!$in_clients || preg_match("/^;/", $line)) continue;
 
+  if ($x == 0 || $x == 500) {
+    if ($x == 500) { $flightpdo->commit(); }
+    $flightpdo->beginTransaction();
+    $x = 1;
+  }
   process_line($line);
 
-  process_missing();
+  $x++;
 }
+$flightpdo->commit();
+process_missing();
 
 function process_line($line) {
-  global $pdo, $readpdo, $prepareds, $current_update;
+  global $pdo, $readpdo, $prepareds, $current_update, $flightpdo;
 
   $data = explode(":", $line);
   // Skip bad data or ATC clients
@@ -160,15 +168,15 @@ function process_line($line) {
 
   if (!$new) {
     $allowed = ['id','aircraft_type','departure','arrival','planned_alt','route','remarks','status','departed_at','arrived_at','arrival_est','lat','lon','alt','hdg','spd','last_update','missing_count'];
-    $pdo->prepare($prepareds['update_flight'])->execute(
+    $flightpdo->prepare($prepareds['update_flight'])->execute(
       array_filter($flight, function($key) use ($allowed) { return in_array($key, $allowed);}, ARRAY_FILTER_USE_KEY)
     );
   } else {
     $allowed = ['callsign','vatsim_id','aircraft_type','departure','arrival','planned_alt','route','remarks','status','lat','lon','alt','hdg','spd','last_update'];
-    $pdo->prepare($prepareds['insert_flight'])->execute(
+    $flightpdo->prepare($prepareds['insert_flight'])->execute(
       array_filter($flight, function($key) use ($allowed) { return in_array($key, $allowed);}, ARRAY_FILTER_USE_KEY)
     );
-    $flight['id'] = $pdo->lastInsertId();
+    $flight['id'] = $flightpdo->lastInsertId();
   }
 
   $interval = 10;
@@ -188,7 +196,7 @@ function process_line($line) {
     $posinterval = $lastpos->format("%i");
   }
   if (!$stmt || ($stmt && $posinterval >= $interval) || $changedstatus || $new) {
-    $pdo->prepare($prepareds['insert_position'])->execute([
+    $flightpdo->prepare($prepareds['insert_position'])->execute([
       'id'        => $flight['id'] . '-' . $current_update,
       'flight_id' => $flight['id'],
       'lat'       => $flight['lat'],
