@@ -159,7 +159,7 @@ function arrivalEst($lat, $lon, $spd, $arrival, $status)
   $est = new DateTime();
   if ($hr > 0) { $hr = $hr . "H"; } else { $hr = ""; }
   if ($min > 0) { $min = $min . "M"; } else { $min = "15M"; }
-  $est->add(new DateInterval("P" . $hr . $min));
+  $est->add(new DateInterval("PT" . $hr . $min));
   return $est->format("Y-m-d H:i:s");
 }
 
