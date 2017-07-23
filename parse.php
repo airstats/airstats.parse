@@ -73,11 +73,12 @@ function process_line($line) {
   $data[planned_route] = preg_replace("/\s+/", " ", trim($data[planned_route])); // Remove extra spaces
 
   $new = 0;
-  $stmt = $pdo->prepare($prepareds['select_flight'])->execute([
+  $stmt = $pdo->prepare($prepareds['select_flight']);
+  $stmt->execute([
     ':callsign' => $data[callsign],
     ':vatsim_id' => $data[cid]
   ]);
-  if ($stmt->rowCount() != 1)
+  if (!$stmt)
     $flight = false;
   else
     $flight = $stmt->fetch();
