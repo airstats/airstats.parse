@@ -57,10 +57,10 @@ function process_line($line) {
 
   $data = explode(":", $line);
   // Skip bad data or ATC clients
-  if (!$data[cid]) continue;
-  if ($data[clienttype] == "ATC") continue;
-  if (!$data[planned_depairport] || !$data[planned_destairport]) continue;
-  if (!$data[latitude] || !$data[longitude]) continue;
+  if (!$data[cid]) return;
+  if ($data[clienttype] == "ATC") return;
+  if (!$data[planned_depairport] || !$data[planned_destairport]) return;
+  if (!$data[latitude] || !$data[longitude]) return;
 
   // Little reformatting
   $data[callsign] = str_replace("-", "", $data[callsign]);
