@@ -153,11 +153,13 @@ function arrivalEst($lat, $lon, $spd, $arrival, $status)
   }
   $dist = calc_distance($lat, $lon, $airport[$arrival]['lat'], $airport[$arrival]['lon']);
   $time = $dist / $spd; // Ground speed estimate
+  echo "Estimating $dist at $spd in $time\n";
   $hr = floor($time);
   $min = intval((($hr - $time) + .25) * 60);
   $est = new DateTime();
   if ($hr > 0) { $hr = $hr . "H"; } else { $hr = ""; }
-  if ($min > 0) { $min = $min . "M"; } else { $min = ""; }
+  if ($min > 0) { $min = $min . "M"; } else { $min = "15M"; }
+  echo "Adding P$hr$min\n";
   $est->add(new DateInterval("P" . $hr . $min));
   return $est->format("Y-m-d H:i:s");
 }
