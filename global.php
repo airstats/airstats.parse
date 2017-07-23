@@ -67,7 +67,7 @@ $prepareds['select_airport'] = "SELECT lat, lon, elevation FROM airports WHERE i
 $prepareds['select_position'] = "SELECT created_at FROM positions WHERE flight_id=:flight_id ORDER BY created_at DESC LIMIT 1";
 $prepareds['insert_position'] = "INSERT INTO `positions`(`id`,`flight_id`,`lat`,`lon`,`alt`,`spd`,`hdg`,`created_at`,`updated_at`) VALUES(:id, :flight_id, :lat, :lon, :alt, :spd, :hdg, NOW(), NOW())";
 $prepareds['select_missing'] = "SELECT * FROM flights WHERE status NOT LIKE 'Arrived' AND 'status' NOT LIKE 'Incomplete' AND last_update < :current_update";
-$prepareds['update_status'] = "UPDATE flights SET status=:status WHERE id=:id"
+$prepareds['update_status'] = "UPDATE flights SET status=:status WHERE id=:id";
 $prepareds['delete_flight'] = "DELETE FROM flights WHERE id=:id";
 $prepareds['delete_positions'] = "DELETE FROM positions WHERE flight_id=:flight_id";
 
@@ -99,7 +99,7 @@ function checkArrival($lat, $lon, $spd, $arrival)
   return false;
 }
 
-function checkDeparture($lat, $lon, $spd, $departure))
+function checkDeparture($lat, $lon, $spd, $departure)
 {
   global $readpdo, $prepareds, $airport;
 
