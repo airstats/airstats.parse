@@ -76,7 +76,7 @@ function process_line($line) {
     ':vatsim_id' => $data[cid]
   ]);
   $flight = $stmt->fetch();
-  if ($flight && $flight['status'] == "Incomplete" && $flight['departure'] == substr($data[planned_depairport, 0, 4])
+  if ($flight && $flight['status'] == "Incomplete" && $flight['departure'] == substr($data[planned_depairport], 0, 4)
     && $flight['arrival'] == substr($data[planned_destairport], 0, 4) && !check_departure($data[latitude], $data[longitude], $data[groundspeed], $data[planned_destairport])) {
       // Resuming flight
       $flight['status'] = "En-Route";
@@ -124,7 +124,7 @@ function process_line($line) {
       $flight->status = "Unknown"; $changedstatus = 1;    // Should never get here unless the plane diverted elsewhere without a FP change
     }
   } elseif (($flight['status'] == "Departing Soon" || $flight['status'] == "Incomplete") && airborne($flight['spd'])) {
-    $flight['departed_at'] = ($flight['departed_at']) ? $flight['departed_at'] : date("Y-m-d H:i:s"));
+    $flight['departed_at'] = ($flight['departed_at']) ? $flight['departed_at'] : date("Y-m-d H:i:s");
     $flight['status'] = "En-Route";
     $changedstatus = 1;
   }
