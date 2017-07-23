@@ -8,7 +8,8 @@ if (file_exists(".lastts")) {
 }
 
 if (!file_exists(config('DATAFILE'))) {
-  die "No datafile defined or does not exist.";
+  echo "No datafile defined or does not exist.";
+  exit;
 }
 
 // Make sure data file complete, otherwise wait a second and try again up to 10 times.
