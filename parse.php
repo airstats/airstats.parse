@@ -109,7 +109,7 @@ function process_line($line) {
       'status' => 'Departing Soon',
       'departed_at' => '',
       'arrived_at' => '',
-      'arrival_est' => null,
+      'arrival_est' => '0000-00-00 00:00:00',
       'lat' => 0,
       'lon' => 0,
       'hdg' => 0,
@@ -167,6 +167,7 @@ function process_line($line) {
   }
 
   if (!$new) {
+    if (empty($flight['arrival_est'])) { $flight['arrival_est'] = null; }
     $allowed = ['id','aircraft_type','departure','arrival','planned_alt','route','remarks','status','departed_at','arrived_at','arrival_est','lat','lon','alt','hdg','spd','last_update','missing_count'];
     $flightpdo->prepare($prepareds['update_flight'])->execute(
       array_filter($flight, function($key) use ($allowed) { return in_array($key, $allowed);}, ARRAY_FILTER_USE_KEY)
