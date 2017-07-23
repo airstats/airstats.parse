@@ -141,7 +141,7 @@ function process_line($line) {
   $flight['planned_alt'] = $data[planned_altitude];
   $changedstatus = 0;
 
-  if (($flight['status'] == "En-Route" || $flight['status'] == "Incomplete") && checkArrival($flight['lat'], $flight['lon'], $flight['spd'], $flight['arrival'])) {
+  if (($flight['status'] == "En-Route" || $flight['status'] == "Incomplete") && $flight['spd'] < 40 && checkArrival($flight['lat'], $flight['lon'], $flight['spd'], $flight['arrival'])) {
     $flight['arrived_at'] = date("Y-m-d H:i:s");
     $changedstatus = 1;
     $flight['status'] = "Arrived";
@@ -149,7 +149,7 @@ function process_line($line) {
     // Try to set a proper status
     if (checkDeparture($flight['lat'], $flight['lon'], $flight['spd'], $flight['departure'])) {
       $flight['status'] = "Departing Soon"; $changedstatus = 1;
-    } elseif (checkArrival($flight['lat'], $flight['lon'], $flight['spd'], $flight['arrival'])) {
+    } elseif ($flight['spd'] < 50 && checkArrival($flight['lat'], $flight['lon'], $flight['spd'], $flight['arrival'])) {
       $flight['status'] = "Arrived"; $changedstatus = 1;
     } elseif (airborne($flight['spd'])) {
       $flight['status'] = "En-Route"; $changedstatus = 1;
