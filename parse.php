@@ -5,6 +5,8 @@ require("global.php");
 
 if (file_exists(".lastts")) {
   $lastts = file_get_contents(".lastts");
+} else {
+  $lastts = false;
 }
 
 if (!file_exists(config('DATAFILE'))) {
