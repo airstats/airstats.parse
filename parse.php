@@ -183,7 +183,7 @@ function process_line($line) {
   $stmt->execute(['flight_id' => $flight['id']]);
   if ($stmt) {
     $row = $stmt->fetch();
-    $lastposition = new DateTime($row['created_at']);
+    $lastpos = new DateTime($row['created_at']);
     $posinterval = $lastpos->diff(new DateTime("now"), true);
     $posinterval = $lastpos->format("%i");
   }
