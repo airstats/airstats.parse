@@ -133,6 +133,8 @@ function process_line($line) {
   } else {
     $flight['aircraft_type'] = $data[planned_aircraft];
   }
+  // Final cleanup
+  $flight['aircraft_type'] = substr(str_replace('/','', $flight['aircraft_type']), 0, 4);
   // Update flight plan details
   $flight['departure'] = substr($data[planned_depairport], 0, 4);
   $flight['arrival'] = substr($data[planned_destairport], 0, 4);
