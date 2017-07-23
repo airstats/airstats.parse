@@ -67,7 +67,7 @@ $prepareds['update_missing_count'] = "UPDATE `flights` SET `missing_count`=:miss
 $prepareds['select_airport'] = "SELECT lat, lon, elevation FROM airports WHERE id=:id";
 $prepareds['select_position'] = "SELECT created_at FROM positions WHERE flight_id=:flight_id ORDER BY created_at DESC LIMIT 1";
 $prepareds['insert_position'] = "INSERT INTO `positions`(`id`,`flight_id`,`lat`,`lon`,`alt`,`spd`,`hdg`,`created_at`,`updated_at`) VALUES(:id, :flight_id, :lat, :lon, :alt, :spd, :hdg, NOW(), NOW())";
-$prepareds['select_missing'] = "SELECT * FROM flights WHERE status NOT LIKE 'Arrived' AND 'status' NOT LIKE 'Incomplete' AND last_update < :current_update";
+$prepareds['select_missing'] = "SELECT * FROM flights WHERE status NOT LIKE 'Arrived' AND status NOT LIKE 'Incomplete' AND last_update < :current_update";
 $prepareds['update_status'] = "UPDATE flights SET status=:status WHERE id=:id";
 $prepareds['delete_flight'] = "DELETE FROM flights WHERE id=:id";
 $prepareds['delete_positions'] = "DELETE FROM positions WHERE flight_id=:flight_id";
