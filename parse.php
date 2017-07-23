@@ -98,7 +98,7 @@ function process_line($line) {
       'route' => '',
       'remarks' => '',
       'planned_alt' => '',
-      'status' => '',
+      'status' => 'Departing Soon',
       'departed_at' => '',
       'arrived_at' => '',
       'arrival_est' => '',
