@@ -76,13 +76,13 @@ $airport = [];
 
 function checkArrival($lat, $lon, $spd, $arrival)
 {
-  global $readpdo, $prepareds, $airport;
+  global $flightpdo, $prepareds, $airport;
 
   if ($arrival == "ZZZZ" || $arrival == '' || $arrival == null) {
     return false;
   }
   if (!isset($airport[$arrival])) {
-    $stmt = $readpdo->prepare($prepareds['select_airport']);
+    $stmt = $flightpdo->prepare($prepareds['select_airport']);
     $stmt->execute([":id" => $arrival]);
     $row = $stmt->fetch();
     if ($row) {
@@ -103,13 +103,13 @@ function checkArrival($lat, $lon, $spd, $arrival)
 
 function checkDeparture($lat, $lon, $spd, $departure)
 {
-  global $readpdo, $prepareds, $airport;
+  global $flightpdo, $prepareds, $airport;
 
   if ($departure == "ZZZZ" || $departure == '' || $departure == null) {
     return false;
   }
   if (!isset($airport[$departure])) {
-    $stmt = $readpdo->prepare($prepareds['select_airport']);
+    $stmt = $flightpdo->prepare($prepareds['select_airport']);
     $stmt->execute([":id" => $departure]);
     $row = $stmt->fetch();
     if ($row) {
@@ -130,7 +130,7 @@ function checkDeparture($lat, $lon, $spd, $departure)
 
 function arrivalEst($lat, $lon, $spd, $arrival, $status)
 {
-  global $readpdo, $prepareds, $airport;
+  global $flightpdo, $prepareds, $airport;
 
   if ($status != "En-Route") {
     return 0;
@@ -141,7 +141,7 @@ function arrivalEst($lat, $lon, $spd, $arrival, $status)
   }
 
   if (!isset($airport[$arrival])) {
-    $stmt = $readpdo->prepare($prepareds['select_airport']);
+    $stmt = $flightpdo->prepare($prepareds['select_airport']);
     $stmt->execute([":id" => $arrival]);
     $row = $stmt->fetch();
     if ($row) {
