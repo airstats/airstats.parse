@@ -209,17 +209,17 @@ function process_line($line) {
 }
 
 function process_missing() {
-  global $readpdo, $pdo, $prepareds, $current_update;
+  global $readpdo, $pdo, $prepareds, $current_update,$current_stamp;
 
   $stmt = $readpdo->prepare($prepareds['select_missing']);
   $stmt->execute(['current_update' => $current_update]);
-  $log = "$current_stamp:\n";
+  $log = "";
   if ($stmt) {
     while ($row = $stmt->fetch()) {
       $pdo->prepare($prepareds['update_missing_count'])->execute(['id' => $row['id'], 'missing_count' => $row['missing_count'] + 1]);
 
       $row['missing_count'] += 1; // For processing's sake
-      $log .= "\t\t" . $row['callsign'] . " - " . $row['missing_count'] . " last updated " . $row['last_update'] . "\n";
+      $log .= "$current_stamp," . $row['callsign'] . "," . $row['missing_count'] . "," . $row['last_update'] . "," . $row['status'];
       if ($row['missing_count'] >= 10) {
         if ($row['status'] == "Departing Soon") {
           $pdo->prepare($prepareds['delete_flight'])->execute(['id' => $row['id']]);
