@@ -65,7 +65,7 @@ $flightpdo->commit();
 process_missing();
 
 function process_line($line) {
-  global $pdo, $readpdo, $prepareds, $current_update, $flightpdo;
+  global $pdo, $readpdo, $prepareds, $current_update, $flightpdo, $current_stamp, $current_minute;
 
   $data = explode(":", $line);
   // Skip bad data or ATC clients
