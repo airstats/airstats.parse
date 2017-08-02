@@ -52,16 +52,16 @@ foreach ($stream as $line) {
 
   if (!$in_clients || preg_match("/^;/", $line)) continue;
 
-  if ($x == 0 || $x == 500) {
+  /*if ($x == 0 || $x == 500) {
     if ($x == 500) { $flightpdo->commit(); }
     $flightpdo->beginTransaction();
     $x = 1;
-  }
+  }*/
   process_line($line);
 
   $x++;
 }
-$flightpdo->commit();
+//$flightpdo->commit();
 process_missing();
 
 function process_line($line) {
