@@ -213,12 +213,13 @@ function process_missing() {
 
   $stmt = $readpdo->prepare($prepareds['select_missing']);
   $stmt->execute(['current_update' => $current_update]);
+  $log = "$current_stamp:\n";
   if ($stmt) {
     while ($row = $stmt->fetch()) {
       $pdo->prepare($prepareds['update_missing_count'])->execute(['id' => $row['id'], 'missing_count' => $row['missing_count'] + 1]);
 
       $row['missing_count'] += 1; // For processing's sake
-
+      $log .= "\t\t" . $row['callsign'] . " - " . $row['missing_count'] . " last updated " . $row['last_update'] . "\n";
       if ($row['missing_count'] >= 10) {
         if ($row['status'] == "Departing Soon") {
           $pdo->prepare($prepareds['delete_flight'])->execute(['id' => $row['id']]);
@@ -230,4 +231,6 @@ function process_missing() {
       }
     }
   }
+
+  file_put_contents("log", $log, FILE_APPEND);
 }
