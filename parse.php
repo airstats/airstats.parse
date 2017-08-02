@@ -219,7 +219,7 @@ function process_missing() {
       $pdo->prepare($prepareds['update_missing_count'])->execute(['id' => $row['id'], 'missing_count' => $row['missing_count'] + 1]);
 
       $row['missing_count'] += 1; // For processing's sake
-      $log .= "$current_stamp," . $row['callsign'] . "," . $row['missing_count'] . "," . $row['last_update'] . "," . $row['status'];
+      $log .= "$current_stamp," . $row['callsign'] . "," . $row['missing_count'] . "," . $row['last_update'] . "," . $row['status'] . ",\n";
       if ($row['missing_count'] >= 10) {
         if ($row['status'] == "Departing Soon") {
           $pdo->prepare($prepareds['delete_flight'])->execute(['id' => $row['id']]);
