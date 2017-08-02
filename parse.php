@@ -33,6 +33,8 @@ if ($lastts && $output[0] == $lastts) {
 }
 
 $current_update = $output[0];
+$current_stamp = substr($current_update, 0, 4) . "-" . substr($current_update, 4, 2) . "-" . substr($current_update, 6, 2) . " " . substr($current_update, 8, 2) . ":" . substr($current_update, 10, 2) . ":" . substr($current_update, 12, 2);
+$current_minute = substr($current_update, 10, 2);
 
 $fp = fopen(".lastts", "w");
 fwrite($fp, $output[0]);
@@ -142,7 +144,7 @@ function process_line($line) {
   $changedstatus = 0;
 
   if (($flight['status'] == "En-Route" || $flight['status'] == "Incomplete") && $flight['spd'] < 40 && checkArrival($flight['lat'], $flight['lon'], $flight['spd'], $flight['arrival'])) {
-    $flight['arrived_at'] = date("Y-m-d H:i:s");
+    $flight['arrived_at'] = $current_stamp;
     $changedstatus = 1;
     $flight['status'] = "Arrived";
   } elseif ($flight['status'] == "Unknown" || $flight['status'] == "Incomplete") {
@@ -157,7 +159,7 @@ function process_line($line) {
       $flight['status'] = "Unknown"; $changedstatus = 1;    // Should never get here unless the plane diverted elsewhere without a FP change
     }
   } elseif (($flight['status'] == "Departing Soon" || $flight['status'] == "Incomplete") && airborne($flight['spd'])) {
-    $flight['departed_at'] = ($flight['departed_at']) ? $flight['departed_at'] : date("Y-m-d H:i:s");
+    $flight['departed_at'] = ($flight['departed_at']) ? $flight['departed_at'] : $current_stamp;
     $flight['status'] = "En-Route";
     $changedstatus = 1;
   }
@@ -189,16 +191,9 @@ function process_line($line) {
     $interval = 5;
   }
 
-  $interval = 0;
-  $stmt = $pdo->prepare($prepareds['select_position']);
-  $stmt->execute(['flight_id' => $flight['id']]);
-  if ($stmt) {
-    $row = $stmt->fetch();
-    $lastpos = new DateTime($row['created_at']);
-    $posinterval = $lastpos->diff(new DateTime("now"), true);
-    $posinterval = $lastpos->format("%i");
-  }
-  if (!$stmt || ($stmt && $posinterval >= $interval) || $changedstatus || $new) {
+  // Synchornize them.
+
+  if (($current_minute % $interval == 0) || $changedstatus || $new) {
     $flightpdo->prepare($prepareds['insert_position'])->execute([
       'id'        => $flight['id'] . '-' . $current_update,
       'flight_id' => $flight['id'],
@@ -206,7 +201,9 @@ function process_line($line) {
       'lon'       => $flight['lon'],
       'alt'       => $flight['alt'],
       'spd'       => $flight['spd'],
-      'hdg'       => $flight['hdg']
+      'hdg'       => $flight['hdg'],
+      'created'   => $current_stamp,
+      'updated'   => $current_stamp
     ]);
   }
 }
@@ -222,7 +219,7 @@ function process_missing() {
 
       $row['missing_count'] += 1; // For processing's sake
 
-      if ($row['missing_count'] >= 5) {
+      if ($row['missing_count'] >= 10) {
         if ($row['status'] == "Departing Soon") {
           $pdo->prepare($prepareds['delete_flight'])->execute(['id' => $row['id']]);
           $pdo->prepare($prepareds['delete_positions'])->execute(['flight_id' => $row['id']]);
