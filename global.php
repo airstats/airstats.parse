@@ -57,8 +57,8 @@ function config($key, $default = null)
 
 $dsn = "mysql:host=" . config("db_host") . ";dbname=" . config("db_name") . ";charset=utf8";
 $opt = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_EMULATE_PREPARES => false];
-$pdo = new PDO($dsn, config("db_user") , config("db_pass") , $opt);
-$readpdo = new PDO($dsn, config("db_user") , config("db_pass") , $opt);
+/*$pdo = new PDO($dsn, config("db_user") , config("db_pass") , $opt);
+$readpdo = new PDO($dsn, config("db_user") , config("db_pass") , $opt);*/
 $flightpdo = new PDO($dsn, config("db_user") , config("db_pass") , $opt);
 $prepareds['select_flight'] = "SELECT * FROM `flights` WHERE `callsign`=:callsign AND `vatsim_id`=:vatsim_id AND `created_at` >= DATE_SUB(NOW(), INTERVAL 24 HOUR) ORDER BY created_at DESC LIMIT 1";
 $prepareds['update_flight'] = "UPDATE `flights` SET `aircraft_type`=:aircraft_type, `departure`=:departure, `arrival`=:arrival, `planned_alt`=:planned_alt, `route`=:route, `remarks`=:remarks, `status`=:status, `departed_at`=:departed_at, `arrived_at`=:arrived_at, `arrival_est`=:arrival_est, `lat`=:lat, `lon`=:lon, `alt`=:alt, `hdg`=:hdg, `spd`=:spd, `missing_count`=:missing_count, `last_update`=:last_update, updated_at=NOW() WHERE `id`=:id";
