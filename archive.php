@@ -12,7 +12,9 @@ if (!file_exists("flights")) {
 }*/
 
 $client = S3Client::factory([
-  'profile' => 'airstats'
+  'profile' => 'airstats',
+  'version' => 'latest',
+  'region' => config('s3_region')
 ]);
 
 $flights = $flightpdo->query("SELECT *, DATE_FORMAT(`created_at`, '%Y%m%d%H%i%s') AS filedate FROM `flights` WHERE `archived`='' AND (`status`='Arrived' OR `status`='Incomplete') AND `updated_at` <= DATE_SUB(NOW(), INTERVAL 1 DAY)")->fetchAll();
