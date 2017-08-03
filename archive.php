@@ -1,6 +1,6 @@
 <?php
-require './aws/aws-autoloader.php';
-require './.config.php';
+require 'aws/aws-autoloader.php';
+require '.config.php';
 require 'global.php';
 
 use Aws\S3\S3Client;
