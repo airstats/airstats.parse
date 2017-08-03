@@ -5,12 +5,6 @@ require 'global.php';
 
 use Aws\S3\S3Client;
 
-/*chdir($config['dir']);
-
-if (!file_exists("flights")) {
-  system("mkdir flights");
-}*/
-
 $client = S3Client::factory([
   'profile' => 'airstats',
   'version' => 'latest',
@@ -33,7 +27,6 @@ foreach($flights as $flight) {
     ];
   }
   $file = "flights/" . $flight['callsign'] . "_" . $flight['filedate'] . ".json";
-  //file_put_contents($file, bzcompress(json_encode($posdata, JSON_NUMERIC_CHECK), 9));
   $result = $client->putObject([
     'Bucket' => config('s3_bucket'),
     'Key' => $file,
