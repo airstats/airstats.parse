@@ -1,6 +1,6 @@
 <?php
 require(".config.php");
-
+require("parse.def.php");
 require("global.php");
 
 if (file_exists(".lastts")) {
@@ -213,13 +213,13 @@ function process_missing() {
 
   $stmt = $flightpdo->prepare($prepareds['select_missing']);
   $stmt->execute(['current_update' => $current_update]);
-  $log = "";
+  //$log = "";
   if ($stmt) {
     while ($row = $stmt->fetch()) {
       $flightpdo->prepare($prepareds['update_missing_count'])->execute(['id' => $row['id'], 'missing_count' => $row['missing_count'] + 1]);
 
       $row['missing_count'] += 1; // For processing's sake
-      $log .= "$current_stamp," . $row['callsign'] . "," . $row['missing_count'] . "," . $row['last_update'] . "," . $row['status'] . ",\n";
+//      $log .= "$current_stamp," . $row['callsign'] . "," . $row['missing_count'] . "," . $row['last_update'] . "," . $row['status'] . ",\n";
       if ($row['missing_count'] >= 10) {
         if ($row['status'] == "Departing Soon") {
           $flightpdo->prepare($prepareds['delete_flight'])->execute(['id' => $row['id']]);
@@ -232,5 +232,112 @@ function process_missing() {
     }
   }
 
-  file_put_contents("log", $log, FILE_APPEND);
+  //file_put_contents("log", $log, FILE_APPEND);
+}
+
+function checkArrival($lat, $lon, $spd, $arrival)
+{
+  global $flightpdo, $prepareds, $airport;
+
+  if ($arrival == "ZZZZ" || $arrival == '' || $arrival == null) {
+    return false;
+  }
+  if (!isset($airport[$arrival])) {
+    $stmt = $flightpdo->prepare($prepareds['select_airport']);
+    $stmt->execute([":id" => $arrival]);
+    $row = $stmt->fetch();
+    if ($row) {
+      $airport[$arrival]['lat'] = $row['lat'];
+      $airport[$arrival]['lon'] = $row['lon'];
+      $airport[$arrival]['elevation'] = $row['elevation'];
+    } else {
+      return false;
+    }
+  }
+  if (!isset($airport[$arrival])) return false;
+  if (calc_distance($lat, $lon, $airport[$arrival]['lat'], $airport[$arrival]['lon']) < 3 && $spd < 40) {
+    return true;
+  }
+
+  return false;
+}
+
+function checkDeparture($lat, $lon, $spd, $departure)
+{
+  global $flightpdo, $prepareds, $airport;
+
+  if ($departure == "ZZZZ" || $departure == '' || $departure == null) {
+    return false;
+  }
+  if (!isset($airport[$departure])) {
+    $stmt = $flightpdo->prepare($prepareds['select_airport']);
+    $stmt->execute([":id" => $departure]);
+    $row = $stmt->fetch();
+    if ($row) {
+      $airport[$departure]['lat'] = $row['lat'];
+      $airport[$departure]['lon'] = $row['lon'];
+      $airport[$departure]['elevation'] = $row['elevation'];
+    } else {
+      return false;
+    }
+  }
+  if (!isset($airport[$departure])) return false;
+  if (calc_distance($lat, $lon, $airport[$departure]['lat'], $airport[$departure]['lon']) < 3 && $spd < 40) {
+    return true;
+  }
+
+  return false;
+}
+
+function arrivalEst($lat, $lon, $spd, $arrival, $status)
+{
+  global $flightpdo, $prepareds, $airport;
+
+  if ($status != "En-Route") {
+    return 0;
+  }
+
+  if (!$arrival || $spd <= 0) {
+    return;
+  }
+
+  if (!isset($airport[$arrival])) {
+    $stmt = $flightpdo->prepare($prepareds['select_airport']);
+    $stmt->execute([":id" => $arrival]);
+    $row = $stmt->fetch();
+    if ($row) {
+      $airport[$arrival]['lat'] = $row['lat'];
+      $airport[$arrival]['lon'] = $row['lon'];
+      $airport[$arrival]['elevation'] = $row['elevation'];
+    } else {
+      return false;
+    }
+  }
+  $dist = calc_distance($lat, $lon, $airport[$arrival]['lat'], $airport[$arrival]['lon']);
+  $time = $dist / $spd; // Ground speed estimate
+  $hr = floor($time);
+  $min = intval((($hr - $time) + .25) * 60);
+  $est = new DateTime();
+  if ($hr > 0) { $hr = $hr . "H"; } else { $hr = ""; }
+  if ($min > 0) { $min = $min . "M"; } else { $min = "15M"; }
+  $est->add(new DateInterval("PT" . $hr . $min));
+  return $est->format("Y-m-d H:i:s");
+}
+
+function airborne($spd)
+{
+  if ($spd > 50) {
+    return true;
+  }
+
+  return false;
+}
+
+function calc_distance($lat1, $lon1, $lat2, $lon2)
+{
+  $theta = $lon1 - $lon2;
+  $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+  $dist = acos($dist);
+  $dist = rad2deg($dist);
+  return abs($dist * 60 * 1.1515 * 0.8684);
 }
