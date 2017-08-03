@@ -5,11 +5,11 @@ require 'global.php';
 
 use Aws\S3\S3Client;
 
-chdir($config['dir']);
+/*chdir($config['dir']);
 
 if (!file_exists("flights")) {
   system("mkdir flights");
-}
+}*/
 
 $client = S3Client::factory([
   'profile' => 'airstats'

@@ -184,11 +184,9 @@ function process_line($line) {
     $flight['id'] = $flightpdo->lastInsertId();
   }
 
-  $interval = 10;
-  if ($flight['spd'] >= 250) {
-    $interval = 2;
-  } elseif ($flight['spd'] >= 100) {
-    $interval = 5;
+  $interval = 2;
+  if ($flight['spd'] >= 300) {
+    $interval = 1;
   }
 
   // Synchornize them.
