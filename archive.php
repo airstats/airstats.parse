@@ -33,6 +33,6 @@ foreach($flights as $flight) {
     'Body' => bzcompress(json_encode($posdata, JSON_NUMERIC_CHECK), 9),
     'ACL' => 'public-read'
   ]);
-  $flightpdo->prepare("UPDATE flights SET archived='$file' WHERE `id`='" . $flight['id'] . "'")->execute();
-  $flightpdo->execute("DELETE FROM `positions` WHERE `flight_id`='" . $flight['id'] . "'");
+  $flightpdo->prepare("UPDATE flights SET archived='$file' WHERE `id`=?")->execute([$flight['id']]);
+  $flightpdo->prepare("DELETE FROM `positions` WHERE `flight_id`=?")->execute([$flight['id']]);
 }
