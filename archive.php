@@ -34,5 +34,5 @@ foreach($flights as $flight) {
     'ACL' => 'public-read'
   ]);
   $flightpdo->prepare("UPDATE flights SET archived='$file' WHERE `id`='" . $flight['id'] . "'")->execute();
-  $flightpdo->execute("DELETE FROM `positions` WHERE `flight_id`='" . $flight['id'] . "'")
+  $flightpdo->execute("DELETE FROM `positions` WHERE `flight_id`='" . $flight['id'] . "'");
 }
