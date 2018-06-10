@@ -4,7 +4,7 @@ require '.config.php';
 require 'global.php';
 require 'vendor/autoload.php';
 
-use MicrosoftAzure\Stroage\Blob\BlobRestProxy;
+use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 
 $blobClient = BlobRestProxy::createBlobService(config('azure_connection_string'));
 
